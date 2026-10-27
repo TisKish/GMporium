@@ -4,7 +4,7 @@ import com.tiskish.GMporium.model.TrackedResource;
 import com.tiskish.GMporium.service.CharacterService;
 import org.springframework.web.bind.annotation.*;
 
-/** Spend/restore tracked resources, and remove inventory items. */
+/** Spend/restore tracked resources. Item mutations live in ItemController. */
 @RestController
 public class ResourceController {
 
@@ -22,10 +22,5 @@ public class ResourceController {
     @PostMapping("/api/resources/{id}/restore")
     public TrackedResource restore(@PathVariable("id") Long id) {
         return service.restoreResource(id);
-    }
-
-    @DeleteMapping("/api/items/{id}")
-    public void removeItem(@PathVariable("id") Long id) {
-        service.removeItem(id);
     }
 }
