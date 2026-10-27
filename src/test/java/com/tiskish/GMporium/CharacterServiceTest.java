@@ -1,9 +1,9 @@
 package com.tiskish.GMporium;
 
-import com.tiskish.GMporium.model.PlayerCharacter;
-import com.tiskish.GMporium.model.TrackedResource;
-import com.tiskish.GMporium.service.CharacterNotFoundException;
-import com.tiskish.GMporium.service.CharacterService;
+import com.tiskish.GMporium.backend.model.PlayerCharacter;
+import com.tiskish.GMporium.backend.model.TrackedResource;
+import com.tiskish.GMporium.backend.service.CharacterNotFoundException;
+import com.tiskish.GMporium.backend.service.CharacterService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

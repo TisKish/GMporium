@@ -1,0 +1,285 @@
+/* Party Sheets — minimal dark-table styling. Not the point of the
+   project (the backend is), but nobody wants to demo an ugly app. */
+
+:root {
+  --bg: #14111b;
+  --panel: #1e1a28;
+  --border: #352d47;
+  --text: #e8e2f4;
+  --muted: #9a8fb5;
+  --accent: #b48cf2;
+  --danger: #e56b6b;
+  --heal: #6fce8b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.app { max-width: 720px; margin: 0 auto; padding: 1rem; }
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+nav strong { color: var(--accent); font-size: 1.2rem; }
+nav span { margin-left: auto; color: var(--muted); }
+
+.tabs { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+button {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+}
+
+button:hover { border-color: var(--accent); }
+button.active { background: var(--accent); color: #14111b; border-color: var(--accent); }
+
+.login {
+  max-width: 380px;
+  margin: 15vh auto;
+  text-align: center;
+  padding: 2rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.login form { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1rem; }
+
+input {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 0.7rem;
+  font-size: 1rem;
+}
+
+.sheet section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.sheet h2 { margin: 0; }
+.sheet h3 { margin: 0 0 0.6rem 0; color: var(--accent); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.subtitle { color: var(--muted); margin: 0.25rem 0 0 0; }
+
+.hpbar {
+  position: relative;
+  height: 2.2rem;
+  background: #2a2438;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 0.6rem;
+}
+
+.hpfill {
+  height: 100%;
+  background: linear-gradient(90deg, #7a4fd0, #b48cf2);
+  transition: width 0.25s;
+}
+
+.hpbar span {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.row { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+.row input { width: 7rem; }
+
+.resource { justify-content: space-between; padding: 0.35rem 0; border-bottom: 1px dashed var(--border); }
+.resource:last-child { border-bottom: none; }
+
+.abilities { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; }
+
+.ability {
+  text-align: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.25rem;
+}
+
+.alabel { display: block; font-size: 0.7rem; color: var(--muted); }
+.ascore { display: block; font-size: 1.3rem; font-weight: bold; }
+.amod { display: block; font-size: 0.8rem; color: var(--accent); }
+
+.error { color: var(--danger); }
+.muted { color: var(--muted); }
+.small { font-size: 0.8rem; }
+
+ul { margin: 0; padding-left: 1.2rem; }
+li { margin: 0.25rem 0; }
+
+/* --- Inventory + Equipment (Diablo doll, BG3 backpack) --- */
+
+.invtabs { margin-bottom: 1rem; }
+.filtertabs button { font-size: 0.85rem; padding: 0.3rem 0.6rem; }
+
+.invtools { margin-bottom: 0.75rem; }
+.invtools input { flex: 1; min-width: 10rem; }
+.invtools select {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem;
+}
+
+.invgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.invitem {
+  text-align: left;
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.invitem.selected { border-color: var(--accent); background: #2a2340; }
+
+.invname { font-weight: bold; }
+.qty {
+  float: right;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.invmeta { font-size: 0.8rem; color: var(--muted); }
+
+.detail {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.detail h4 { margin: 0 0 0.25rem 0; }
+.detail p { margin: 0.25rem 0; }
+
+.weightbar { margin: 0.75rem 0; }
+.weighttrack {
+  height: 0.9rem;
+  background: #2a2438;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+.weightfill { height: 100%; background: var(--accent); transition: width 0.25s; }
+.weightfill.over { background: var(--danger); }
+
+.addform {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border);
+}
+.addform input, .addform select {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem;
+}
+.addform input:first-child { flex: 1 1 12rem; }
+
+button.danger { color: var(--danger); }
+
+/* Diablo rarity colors (item names). */
+.rarity-common { color: var(--text); }
+.rarity-uncommon { color: #6fce8b; }
+.rarity-rare { color: #6b9fe5; }
+.rarity-very_rare { color: #b48cf2; }
+.rarity-legendary { color: #e59a4b; }
+
+/* Paper doll: slots arranged around a center portrait. */
+.doll {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  grid-template-areas:
+    "head portrait neck"
+    "shoulders portrait mainhand"
+    "chest portrait offhand"
+    "hands portrait ring1"
+    "waist portrait ring2"
+    "legs portrait ."
+    "feet portrait .";
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.dollslot {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem;
+  min-height: 3.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.15rem;
+  cursor: default;
+}
+.dollslot.filled { cursor: pointer; }
+.dollslot.filled:hover { border-color: var(--accent); }
+.dollslot.empty { border-style: dashed; }
+
+.slotlabel { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.slotitem { font-weight: bold; font-size: 0.9rem; }
+.slotempty { color: var(--muted); font-size: 0.85rem; font-style: italic; }
+
+.portrait {
+  grid-area: portrait;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.portrait span {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: #2a2340;
+  border: 2px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--accent);
+}
+.portrait small { color: var(--muted); }
