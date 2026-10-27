@@ -1,6 +1,5 @@
 package com.tiskish.GMporium.web;
 
-import com.tiskish.GMporium.model.InventoryItem;
 import com.tiskish.GMporium.model.PlayerCharacter;
 import com.tiskish.GMporium.model.TrackedResource;
 import com.tiskish.GMporium.service.CharacterService;
@@ -74,10 +73,16 @@ public class CharacterController {
         return service.addResource(id, body.name(), body.max());
     }
 
+    /**
+     * Like every other mutation in this app, returns the updated character
+     * (not just the new item) so the UI can swap it straight in.
+     */
     @PostMapping("/{id}/items")
     @ResponseStatus(HttpStatus.CREATED)
-    public InventoryItem addItem(@PathVariable("id") Long id,
+    public PlayerCharacter addItem(@PathVariable("id") Long id,
             @Valid @RequestBody Requests.CreateItemRequest body) {
-        return service.addItem(id, body.name(), body.quantity(), body.notes());
+        return service.addItem(id, body.name(), body.quantity(), body.notes(),
+                body.category(), body.weight() == null ? 0 : body.weight(), body.rarity())
+                .getCharacter();
     }
 }
