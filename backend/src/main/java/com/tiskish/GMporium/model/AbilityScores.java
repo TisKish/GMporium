@@ -1,4 +1,4 @@
-package com.tiskish.GMporium.backend.model;
+package com.tiskish.GMporium.model;
 
 import jakarta.persistence.Embeddable;
 
