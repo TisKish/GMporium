@@ -8,10 +8,14 @@ package com.tiskish.GMporium.model;
  */
 public enum ItemCategory {
     WEAPON,
-    ARMOR,
-    CONSUMABLE,
+    POTION,
+    SCROLL,
+    FOOD,
     GEAR,
     TOOL,
+    KEY,
     TREASURE,
+    INGREDIENT,
+    COMPONENT,
     MISC
 }
