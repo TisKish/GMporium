@@ -145,13 +145,13 @@ public class CharacterService {
 
     /**
      * Which slots each equippable category may occupy. Everything else
-     * (CONSUMABLE, GEAR, TOOL, MISC) is backpack-only. ARMOR includes
+     * (CONSUMABLE, GEAR, TOOL, MISC) is backpack-only. GEAR includes
      * OFF_HAND so shields have a home; two-handed weapons blocking the
      * off hand is a deferred rule, not an oversight — see SETUP.md.
      */
     private static final Map<ItemCategory, Set<EquipmentSlot>> EQUIPPABLE_SLOTS = new EnumMap<>(Map.of(
             ItemCategory.WEAPON, Set.of(EquipmentSlot.MAIN_HAND, EquipmentSlot.OFF_HAND),
-            ItemCategory.ARMOR, Set.of(
+            ItemCategory.GEAR, Set.of(
                     EquipmentSlot.HEAD, EquipmentSlot.SHOULDERS, EquipmentSlot.CHEST,
                     EquipmentSlot.HANDS, EquipmentSlot.WAIST, EquipmentSlot.LEGS,
                     EquipmentSlot.FEET, EquipmentSlot.OFF_HAND),
@@ -189,8 +189,8 @@ public class CharacterService {
     @Transactional
     public PlayerCharacter useItem(Long itemId) {
         InventoryItem item = findItem(itemId);
-        if (item.getCategory() != ItemCategory.CONSUMABLE) {
-            throw new IllegalArgumentException("Only consumables can be used");
+        if (item.getCategory() != ItemCategory.POTION) {
+            throw new IllegalArgumentException("Only potions can be used");
         }
         if (item.isEquipped()) {
             throw new IllegalArgumentException("Unequip an item before using it");
