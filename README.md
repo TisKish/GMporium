@@ -9,6 +9,9 @@ whole party. Think "personalized D&D Beyond," scoped to one thing done well.
 
 **MVP (what's built):** character sheets + HP damage/heal + resource
 tracking + inventory + long rest, with DM/player logins.
+**Inventory (built 2026-10-27):** a Diablo-style equipment paper doll and a
+BG3-style backpack grid with category filters, search, sort, a detail pane,
+and a weight bar against STR x 15 carrying capacity (see section 4).
 **Explicitly not MVP:** combat tracker, dice roller, spell database, maps.
 Those are phase 2 — the trap is building everything at once and finishing
 nothing.
@@ -211,7 +214,52 @@ controller -> service -> repository -> DB.
 
 ---
 
-## 4. Your next build tasks (in order — each is 1–2 sessions)
+## 4. Inventory: equipment doll + backpack (built 2026-10-27)
+
+The MVP focus after the scaffold: inventory players actually touch every
+session, split across two tabs on the character sheet.
+
+**Model** (`model/`): `InventoryItem` gained `category` (enum: WEAPON,
+ARMOR, CONSUMABLE, GEAR, TOOL, TREASURE, MISC), `weight` per unit in lb,
+`rarity` (COMMON to LEGENDARY, presentational only), and `equippedSlot`
+(enum, nullable). There is no separate `equipped` boolean: non-null slot
+is exactly what equipped means, so the two can never drift apart.
+`PlayerCharacter` exposes two derived, unstored properties:
+`carryingCapacity` (STR x 15) and `totalWeight` (sum of weight x quantity).
+
+**Rules** (`CharacterService`): only WEAPON, ARMOR and TREASURE are
+equippable, each to a fixed slot set (ARMOR includes OFF_HAND so shields
+have a home; TREASURE covers neck + rings). Equipping into an occupied
+slot swaps the old item back to the backpack instead of deleting it.
+Using a consumable decrements quantity and removes the stack at zero.
+Every item mutation returns the updated character, matching the app's
+existing UI convention. Slot compatibility is enforced server-side; the
+frontend's equip dropdown mirrors the same map for display only.
+
+**Endpoints** (`ItemController`): POST `/api/items/{id}/equip` (body:
+`{slot}`), POST `/api/items/{id}/unequip`, POST `/api/items/{id}/use`,
+DELETE `/api/items/{id}` (drop), POST `/api/characters/{id}/items` (add,
+returns the updated character). The old item-delete in
+`ResourceController` moved here with the same path.
+
+**UI** (`EquipmentPanel.jsx`, `InventoryPanel.jsx`): the Equipment tab is
+a paper doll, slots arranged around a portrait, click an equipped item to
+unequip it. The Inventory tab is the backpack grid (equipped items are
+excluded, they live on the doll) with category filter tabs and counts,
+search, sort by name/weight/quantity, a click-to-open detail pane with
+equip (slot picker), use, and drop actions, and a weight bar that turns
+red past capacity.
+
+**Tests** (`InventoryServiceTest.java`): equip, equip-swap, incompatible
+slot rejection, unequip, consumable decrement + removal at zero,
+non-consumable use rejection, add defaults, capacity and weight math.
+
+**Deferred, deliberately:** two-handed weapons blocking the off-hand slot
+(the slot map has no notion of it yet); stack splitting; item value/gold.
+
+---
+
+## 5. Your next build tasks (in order — each is 1–2 sessions)
 
 1. **Real stats.** `SeedData.java` has placeholder ability scores/HP —
    replace with your party's actual numbers (or fix them in the UI once
@@ -239,7 +287,7 @@ controller -> service -> repository -> DB.
 
 ---
 
-## 5. Interview cheat sheet (what each piece demonstrates)
+## 6. Interview cheat sheet (what each piece demonstrates)
 
 | Piece | What you can now talk about |
 |---|---|
