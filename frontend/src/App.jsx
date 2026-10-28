@@ -1,17 +1,30 @@
 import { useState } from "react";
+import { Capacitor } from "@capacitor/core";
 import { api, setCredentials, clearCredentials } from "./api";
 import CharacterSheet from "./CharacterSheet";
+
+// Capacitor only: the phone app needs to know where the backend lives
+// (your PC's LAN IP on the same Wi-Fi). Web dev never sees this field —
+// there the Vite proxy handles it. Saved to localStorage on login, so the
+// app remembers the server between launches.
+const isNative = Capacitor.isNativePlatform();
 
 export default function App() {
   const [user, setUser] = useState(null);
   const [characters, setCharacters] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [form, setForm] = useState({ username: "", password: "" });
+  const [serverUrl, setServerUrl] = useState(
+    () => localStorage.getItem("apiBase") || ""
+  );
   const [error, setError] = useState("");
 
   async function login(e) {
     e.preventDefault();
     setError("");
+    if (isNative) {
+      localStorage.setItem("apiBase", serverUrl.trim());
+    }
     setCredentials(form.username, form.password);
     try {
       // Listing characters doubles as a credentials check.
@@ -55,6 +68,20 @@ export default function App() {
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
           />
+          {isNative && (
+            <>
+              <input
+                placeholder="Server URL, e.g. http://192.168.1.42:8080"
+                value={serverUrl}
+                onChange={(e) => setServerUrl(e.target.value)}
+              />
+              <p className="muted small">
+                Your PC's address on the same Wi-Fi as the phone. Find it
+                with ipconfig (look for IPv4 Address). Leave it saved once
+                and the app remembers it.
+              </p>
+            </>
+          )}
           <button type="submit">Log in</button>
         </form>
         {error && <p className="error">{error}</p>}

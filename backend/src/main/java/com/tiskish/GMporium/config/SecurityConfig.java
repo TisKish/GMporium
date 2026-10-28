@@ -29,6 +29,7 @@ public class SecurityConfig {
                 // The React dev server runs on another origin; CSRF tokens would
                 // block it. Disabled for local dev only — re-enable before deploying.
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 // Lets the H2 console render inside a browser frame.
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .authorizeHttpRequests(auth -> auth

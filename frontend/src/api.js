@@ -6,6 +6,16 @@
 // dev; a deployed app would use a session cookie or token instead.
 let credentials = null;
 
+// Where the API lives. Web dev: relative paths, the Vite proxy forwards
+// /api to the backend. Capacitor: the app runs from https://localhost on
+// the phone, so it needs an absolute URL to a backend the phone can reach
+// (your PC's LAN IP on the same Wi-Fi, or a deployed backend later).
+// Resolution order: a server URL saved in the app (login screen, native
+// only) wins, then VITE_API_URL baked in at build time, then relative.
+function apiBase() {
+  return localStorage.getItem("apiBase") || import.meta.env.VITE_API_URL || "";
+}
+
 export function setCredentials(username, password) {
   credentials = btoa(`${username}:${password}`);
 }
@@ -15,7 +25,7 @@ export function clearCredentials() {
 }
 
 async function request(path, options = {}) {
-  const res = await fetch(path, {
+  const res = await fetch(`${apiBase()}${path}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
