@@ -1,6 +1,14 @@
 # GMGold
 A personalized system that tracks all elements of a TTRPG. Built as a means to consolidate many different tools into one place.
 
+# Run the App
+In a git bash terminal cd to /backend
+- ./mvnw spring-boot:run
+
+In a seperate terminal cd to /frontend
+- npx vite
+- navigate to the provided url
+
 # Party Sheets — setup walkthrough (square one)
 
 A character-sheet app for your D&D table: players view their sheet and track
