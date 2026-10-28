@@ -1,10 +1,10 @@
-package com.tiskish.GMporium.backend.config;
+package com.tiskish.GMporium.config;
 
-import com.tiskish.GMporium.backend.model.AbilityScores;
-import com.tiskish.GMporium.backend.model.InventoryItem;
-import com.tiskish.GMporium.backend.model.PlayerCharacter;
-import com.tiskish.GMporium.backend.model.TrackedResource;
-import com.tiskish.GMporium.backend.repository.CharacterRepository;
+import com.tiskish.GMporium.model.AbilityScores;
+import com.tiskish.GMporium.model.InventoryItem;
+import com.tiskish.GMporium.model.PlayerCharacter;
+import com.tiskish.GMporium.model.TrackedResource;
+import com.tiskish.GMporium.repository.CharacterRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
