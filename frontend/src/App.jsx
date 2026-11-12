@@ -1,5 +1,22 @@
 import { useState } from "react";
 import { Capacitor } from "@capacitor/core";
+import {
+  IonApp,
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonInput,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonPage,
+  IonSegment,
+  IonSegmentButton,
+  IonText,
+  IonTitle,
+  IonToolbar,
+} from "@ionic/react";
 import { api, setCredentials, clearCredentials } from "./api";
 import CharacterSheet from "./CharacterSheet";
 
@@ -53,67 +70,106 @@ export default function App() {
 
   if (!user) {
     return (
-      <div className="login">
-        <h1>Party Sheets</h1>
-        <p className="muted">Character sheets for the table. Log in to begin.</p>
-        <form onSubmit={login}>
-          <input
-            placeholder="username (dm, uri, etsuko, jelly, odessa)"
-            value={form.username}
-            onChange={(e) => setForm({ ...form, username: e.target.value })}
-          />
-          <input
-            type="password"
-            placeholder="password"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-          />
-          {isNative && (
-            <>
-              <input
-                placeholder="Server URL, e.g. http://192.168.1.42:8080"
-                value={serverUrl}
-                onChange={(e) => setServerUrl(e.target.value)}
-              />
-              <p className="muted small">
-                Your PC's address on the same Wi-Fi as the phone. Find it
-                with ipconfig (look for IPv4 Address). Leave it saved once
-                and the app remembers it.
-              </p>
-            </>
-          )}
-          <button type="submit">Log in</button>
-        </form>
-        {error && <p className="error">{error}</p>}
-        <p className="muted small">Dev logins: dm / dm, or a player name / password</p>
-      </div>
+      <IonApp>
+        <IonPage>
+          <IonContent className="ion-padding">
+            <div className="login">
+              <h1>Party Sheets</h1>
+              <p className="muted">Character sheets for the table. Log in to begin.</p>
+              <form onSubmit={login}>
+                <IonList>
+                  <IonItem>
+                    <IonInput
+                      label="Username"
+                      labelPlacement="stacked"
+                      placeholder="dm, uri, etsuko, jelly, odessa"
+                      value={form.username}
+                      onIonInput={(e) =>
+                        setForm({ ...form, username: e.detail.value ?? "" })
+                      }
+                    />
+                  </IonItem>
+                  <IonItem>
+                    <IonInput
+                      label="Password"
+                      labelPlacement="stacked"
+                      type="password"
+                      value={form.password}
+                      onIonInput={(e) =>
+                        setForm({ ...form, password: e.detail.value ?? "" })
+                      }
+                    />
+                  </IonItem>
+                  {isNative && (
+                    <IonItem>
+                      <IonInput
+                        label="Server URL"
+                        labelPlacement="stacked"
+                        placeholder="http://192.168.1.42:8080"
+                        value={serverUrl}
+                        onIonInput={(e) => setServerUrl(e.detail.value ?? "")}
+                      />
+                    </IonItem>
+                  )}
+                </IonList>
+                {isNative && (
+                  <p className="muted small">
+                    Your PC's address on the same Wi-Fi as the phone. Find it
+                    with ipconfig (look for IPv4 Address). Leave it saved
+                    once and the app remembers it.
+                  </p>
+                )}
+                <IonButton expand="block" type="submit">
+                  Log in
+                </IonButton>
+              </form>
+              {error && (
+                <IonText color="danger">
+                  <p>{error}</p>
+                </IonText>
+              )}
+              <p className="muted small">Dev logins: dm / dm, or a player name / password</p>
+            </div>
+          </IonContent>
+        </IonPage>
+      </IonApp>
     );
   }
 
   const selected = characters.find((c) => c.id === selectedId);
 
   return (
-    <div className="app">
-      <nav>
-        <strong>Party Sheets</strong>
-        <div className="tabs">
-          {characters.map((c) => (
-            <button
-              key={c.id}
-              className={c.id === selectedId ? "active" : ""}
-              onClick={() => setSelectedId(c.id)}
+    <IonApp>
+      <IonPage>
+        <IonHeader>
+          <IonToolbar>
+            <IonTitle>Party Sheets</IonTitle>
+            <IonButtons slot="end">
+              <IonButton onClick={logout}>Log out ({user})</IonButton>
+            </IonButtons>
+          </IonToolbar>
+          <IonToolbar>
+            <IonSegment
+              value={selectedId === null ? "" : String(selectedId)}
+              onIonChange={(e) => setSelectedId(Number(e.detail.value))}
+              scrollable
             >
-              {c.name}
-            </button>
-          ))}
-        </div>
-        <span>
-          {user} <button onClick={logout}>log out</button>
-        </span>
-      </nav>
-      {selected && (
-        <CharacterSheet character={selected} onChange={handleChange} />
-      )}
-    </div>
+              {characters.map((c) => (
+                <IonSegmentButton key={c.id} value={String(c.id)}>
+                  <IonLabel>{c.name}</IonLabel>
+                </IonSegmentButton>
+              ))}
+            </IonSegment>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent>
+          <div className="app">
+            {selected && (
+              <CharacterSheet character={selected} onChange={handleChange} />
+            )}
+          </div>
+        </IonContent>
+      </IonPage>
+    </IonApp>
   );
 }

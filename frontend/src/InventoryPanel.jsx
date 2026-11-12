@@ -1,4 +1,31 @@
 import { useState } from "react";
+import {
+  IonButton,
+  IonButtons,
+  IonCard,
+  IonCardHeader,
+  IonCardSubtitle,
+  IonCardTitle,
+  IonCol,
+  IonContent,
+  IonGrid,
+  IonHeader,
+  IonInput,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonModal,
+  IonProgressBar,
+  IonRow,
+  IonSearchbar,
+  IonSegment,
+  IonSegmentButton,
+  IonSelect,
+  IonSelectOption,
+  IonText,
+  IonTitle,
+  IonToolbar,
+} from "@ionic/react";
 import { api } from "./api";
 import { SLOT_LABELS } from "./EquipmentPanel";
 
@@ -34,9 +61,10 @@ const EQUIPPABLE_SLOTS = {
 const RARITIES = ["COMMON", "UNCOMMON", "RARE", "VERY_RARE", "LEGENDARY"];
 
 /**
- * BG3-style inventory: a grid of item tiles with category filter tabs,
- * search, sort, a detail pane, and a weight bar against STR x 15 capacity.
- * The grid shows the backpack only; worn gear lives on the Equipment tab.
+ * BG3-style inventory, Ionic edition: filter segments, a search bar, a
+ * card grid, a modal detail sheet, a progress-bar weight meter, and a
+ * modal add-item form. The grid shows the backpack only; worn gear lives
+ * on the Equipment tab.
  */
 export default function InventoryPanel({ character, mutate }) {
   const [filter, setFilter] = useState("ALL");
@@ -95,194 +123,266 @@ export default function InventoryPanel({ character, mutate }) {
 
   return (
     <div>
-      <div className="tabs filtertabs">
+      <IonSegment
+        value={filter}
+        onIonChange={(e) => {
+          setFilter(e.detail.value);
+          setSelectedId(null);
+        }}
+        scrollable
+      >
         {["ALL", ...CATEGORIES].map((cat) => (
-          <button
-            key={cat}
-            className={filter === cat ? "active" : ""}
-            onClick={() => {
-              setFilter(cat);
-              setSelectedId(null);
-            }}
-          >
-            {cat === "ALL" ? "All" : CATEGORY_LABELS[cat]} ({countFor(cat)})
-          </button>
+          <IonSegmentButton key={cat} value={cat}>
+            <IonLabel>
+              {cat === "ALL" ? "All" : CATEGORY_LABELS[cat]} ({countFor(cat)})
+            </IonLabel>
+          </IonSegmentButton>
         ))}
-      </div>
+      </IonSegment>
 
-      <div className="row invtools">
-        <input
-          placeholder="Search inventory..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <select value={sort} onChange={(e) => setSort(e.target.value)}>
-          <option value="name">Sort: Name</option>
-          <option value="weight">Sort: Weight</option>
-          <option value="quantity">Sort: Quantity</option>
-        </select>
-      </div>
+      <IonSearchbar
+        value={search}
+        debounce={150}
+        showClearButton="focus"
+        placeholder="Search inventory..."
+        onIonInput={(e) => setSearch(e.detail.value ?? "")}
+      />
+
+      <IonItem>
+        <IonSelect
+          value={sort}
+          onIonChange={(e) => setSort(e.detail.value)}
+          label="Sort"
+          interface="action-sheet"
+        >
+          <IonSelectOption value="name">Name</IonSelectOption>
+          <IonSelectOption value="weight">Weight</IonSelectOption>
+          <IonSelectOption value="quantity">Quantity</IonSelectOption>
+        </IonSelect>
+      </IonItem>
 
       {visible.length === 0 && (
-        <p className="muted">
-          {backpack.length === 0 ? "Empty pockets." : "Nothing matches that filter."}
-        </p>
-      )}
-
-      <div className="invgrid">
-        {visible.map((item) => (
-          <button
-            key={item.id}
-            className={`invitem ${selectedId === item.id ? "selected" : ""}`}
-            onClick={() => {
-              setSelectedId(item.id);
-              const slots = EQUIPPABLE_SLOTS[item.category];
-              if (slots) setEquipSlot(slots[0]);
-            }}
-          >
-            <span className={`invname rarity-${item.rarity.toLowerCase()}`}>
-              {item.name}
-            </span>
-            {item.quantity > 1 && <span className="qty">x{item.quantity}</span>}
-            <span className="invmeta">
-              {CATEGORY_LABELS[item.category]} · {item.weight * item.quantity} lb
-            </span>
-          </button>
-        ))}
-      </div>
-
-      {selected && (
-        <div className="detail">
-          <h4 className={`rarity-${selected.rarity.toLowerCase()}`}>{selected.name}</h4>
-          <p className="muted small">
-            {selected.rarity.charAt(0) + selected.rarity.slice(1).toLowerCase()} ·{" "}
-            {CATEGORY_LABELS[selected.category]} · {selected.weight} lb each ·{" "}
-            {selected.weight * selected.quantity} lb total
-            {selected.equippedSlot && ` · equipped (${SLOT_LABELS[selected.equippedSlot]})`}
+        <IonText color="medium">
+          <p>
+            {backpack.length === 0 ? "Empty pockets." : "Nothing matches that filter."}
           </p>
-          {selected.notes && <p>{selected.notes}</p>}
-          <div className="row">
-            {selected.equippedSlot && (
-              <button
-                onClick={() => mutate(() => api.unequipItem(selected.id))}
-              >
-                Unequip
-              </button>
-            )}
-            {equippable && (
-              <>
-                <select
-                  value={equipSlot}
-                  onChange={(e) => setEquipSlot(e.target.value)}
-                >
-                  {equippable.map((s) => (
-                    <option key={s} value={s}>
-                      {SLOT_LABELS[s]}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  onClick={() =>
-                    mutate(() => api.equipItem(selected.id, equipSlot))
-                  }
-                >
-                  Equip
-                </button>
-              </>
-            )}
-            {selected.category === "CONSUMABLE" && (
-              <button onClick={() => mutate(() => api.useItem(selected.id))}>
-                Use
-              </button>
-            )}
-            <button
-              className="danger"
-              onClick={() =>
-                window.confirm(`Drop ${selected.name}?`) &&
-                mutate(() => api.dropItem(selected.id))
-              }
-            >
-              Drop
-            </button>
-          </div>
-          {equippable && (
-            <p className="muted small">
-              Equipping into an occupied slot swaps the old item back to your
-              backpack.
-            </p>
-          )}
-        </div>
+        </IonText>
       )}
 
-      <div className="weightbar">
-        <div className="weighttrack">
-          <div
-            className={`weightfill ${overCapacity ? "over" : ""}`}
-            style={{ width: `${weightPct}%` }}
-          />
-        </div>
-        <span className={overCapacity ? "error" : "muted"}>
+      <IonGrid>
+        <IonRow>
+          {visible.map((item) => (
+            <IonCol key={item.id} size="6" sizeMd="4">
+              <IonCard
+                className={`invcard ${selectedId === item.id ? "selected" : ""}`}
+                onClick={() => {
+                  setSelectedId(item.id);
+                  const slots = EQUIPPABLE_SLOTS[item.category];
+                  if (slots) setEquipSlot(slots[0]);
+                }}
+              >
+                <IonCardHeader>
+                  <IonCardTitle className={`rarity-${item.rarity.toLowerCase()}`}>
+                    {item.name}
+                    {item.quantity > 1 && ` ×${item.quantity}`}
+                  </IonCardTitle>
+                  <IonCardSubtitle>
+                    {CATEGORY_LABELS[item.category]} · {item.weight * item.quantity} lb
+                  </IonCardSubtitle>
+                </IonCardHeader>
+              </IonCard>
+            </IonCol>
+          ))}
+        </IonRow>
+      </IonGrid>
+
+      <IonProgressBar
+        value={weightPct / 100}
+        color={overCapacity ? "danger" : "primary"}
+      />
+      <IonText color={overCapacity ? "danger" : "medium"}>
+        <p>
           {totalWeight} / {capacity} lb
           {overCapacity && " — encumbered!"}
-        </span>
-      </div>
+        </p>
+      </IonText>
 
-      {!showForm ? (
-        <button onClick={() => setShowForm(true)}>Add item</button>
-      ) : (
-        <form className="addform" onSubmit={addItem}>
-          <input
-            placeholder="Item name"
-            required
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-          />
-          <input
-            type="number"
-            min="1"
-            placeholder="Qty"
-            value={form.quantity}
-            onChange={(e) => setForm({ ...form, quantity: e.target.value })}
-          />
-          <select
-            value={form.category}
-            onChange={(e) => setForm({ ...form, category: e.target.value })}
-          >
-            {CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {CATEGORY_LABELS[c]}
-              </option>
-            ))}
-          </select>
-          <input
-            type="number"
-            min="0"
-            step="0.1"
-            placeholder="Weight (lb each)"
-            value={form.weight}
-            onChange={(e) => setForm({ ...form, weight: e.target.value })}
-          />
-          <select
-            value={form.rarity}
-            onChange={(e) => setForm({ ...form, rarity: e.target.value })}
-          >
-            {RARITIES.map((r) => (
-              <option key={r} value={r}>
-                {r.charAt(0) + r.slice(1).toLowerCase().replace("_", " ")}
-              </option>
-            ))}
-          </select>
-          <input
-            placeholder="Notes (optional)"
-            value={form.notes}
-            onChange={(e) => setForm({ ...form, notes: e.target.value })}
-          />
-          <button type="submit">Add</button>
-          <button type="button" onClick={() => setShowForm(false)}>
-            Cancel
-          </button>
-        </form>
-      )}
+      <IonButton expand="block" onClick={() => setShowForm(true)}>
+        Add item
+      </IonButton>
+
+      <IonModal isOpen={selected !== null} onDidDismiss={() => setSelectedId(null)}>
+        <IonHeader>
+          <IonToolbar>
+            <IonTitle>{selected?.name}</IonTitle>
+            <IonButtons slot="end">
+              <IonButton onClick={() => setSelectedId(null)}>Close</IonButton>
+            </IonButtons>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent className="ion-padding">
+          {selected && (
+            <>
+              <IonText color="medium">
+                <p>
+                  {selected.rarity.charAt(0) + selected.rarity.slice(1).toLowerCase()} ·{" "}
+                  {CATEGORY_LABELS[selected.category]} · {selected.weight} lb each ·{" "}
+                  {selected.weight * selected.quantity} lb total
+                  {selected.equippedSlot &&
+                    ` · equipped (${SLOT_LABELS[selected.equippedSlot]})`}
+                </p>
+              </IonText>
+              {selected.notes && <p>{selected.notes}</p>}
+              {equippable && (
+                <IonItem>
+                  <IonSelect
+                    value={equipSlot}
+                    onIonChange={(e) => setEquipSlot(e.detail.value)}
+                    label="Equip to"
+                    interface="action-sheet"
+                  >
+                    {equippable.map((s) => (
+                      <IonSelectOption key={s} value={s}>
+                        {SLOT_LABELS[s]}
+                      </IonSelectOption>
+                    ))}
+                  </IonSelect>
+                </IonItem>
+              )}
+              <div className="row" style={{ marginTop: "1rem" }}>
+                {equippable && (
+                  <IonButton
+                    onClick={() => mutate(() => api.equipItem(selected.id, equipSlot))}
+                  >
+                    Equip
+                  </IonButton>
+                )}
+                {selected.equippedSlot && (
+                  <IonButton
+                    onClick={() => mutate(() => api.unequipItem(selected.id))}
+                  >
+                    Unequip
+                  </IonButton>
+                )}
+                {selected.category === "CONSUMABLE" && (
+                  <IonButton onClick={() => mutate(() => api.useItem(selected.id))}>
+                    Use
+                  </IonButton>
+                )}
+                <IonButton
+                  color="danger"
+                  onClick={() =>
+                    window.confirm(`Drop ${selected.name}?`) &&
+                    mutate(() => api.dropItem(selected.id))
+                  }
+                >
+                  Drop
+                </IonButton>
+              </div>
+              {equippable && (
+                <IonText color="medium">
+                  <p className="small">
+                    Equipping into an occupied slot swaps the old item back to
+                    your backpack.
+                  </p>
+                </IonText>
+              )}
+            </>
+          )}
+        </IonContent>
+      </IonModal>
+
+      <IonModal isOpen={showForm} onDidDismiss={() => setShowForm(false)}>
+        <IonHeader>
+          <IonToolbar>
+            <IonTitle>Add item</IonTitle>
+            <IonButtons slot="end">
+              <IonButton onClick={() => setShowForm(false)}>Cancel</IonButton>
+            </IonButtons>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent className="ion-padding">
+          <form onSubmit={addItem}>
+            <IonList>
+              <IonItem>
+                <IonInput
+                  label="Item name"
+                  labelPlacement="stacked"
+                  required
+                  value={form.name}
+                  onIonInput={(e) => setForm({ ...form, name: e.detail.value ?? "" })}
+                />
+              </IonItem>
+              <IonItem>
+                <IonInput
+                  label="Quantity"
+                  labelPlacement="stacked"
+                  type="number"
+                  min="1"
+                  value={form.quantity}
+                  onIonInput={(e) =>
+                    setForm({ ...form, quantity: e.detail.value ?? 1 })
+                  }
+                />
+              </IonItem>
+              <IonItem>
+                <IonSelect
+                  label="Category"
+                  labelPlacement="stacked"
+                  value={form.category}
+                  onIonChange={(e) => setForm({ ...form, category: e.detail.value })}
+                  interface="action-sheet"
+                >
+                  {CATEGORIES.map((c) => (
+                    <IonSelectOption key={c} value={c}>
+                      {CATEGORY_LABELS[c]}
+                    </IonSelectOption>
+                  ))}
+                </IonSelect>
+              </IonItem>
+              <IonItem>
+                <IonInput
+                  label="Weight (lb each)"
+                  labelPlacement="stacked"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={form.weight}
+                  onIonInput={(e) =>
+                    setForm({ ...form, weight: e.detail.value ?? 0 })
+                  }
+                />
+              </IonItem>
+              <IonItem>
+                <IonSelect
+                  label="Rarity"
+                  labelPlacement="stacked"
+                  value={form.rarity}
+                  onIonChange={(e) => setForm({ ...form, rarity: e.detail.value })}
+                  interface="action-sheet"
+                >
+                  {RARITIES.map((r) => (
+                    <IonSelectOption key={r} value={r}>
+                      {r.charAt(0) + r.slice(1).toLowerCase().replace("_", " ")}
+                    </IonSelectOption>
+                  ))}
+                </IonSelect>
+              </IonItem>
+              <IonItem>
+                <IonInput
+                  label="Notes (optional)"
+                  labelPlacement="stacked"
+                  value={form.notes}
+                  onIonInput={(e) => setForm({ ...form, notes: e.detail.value ?? "" })}
+                />
+              </IonItem>
+            </IonList>
+            <IonButton expand="block" type="submit" style={{ marginTop: "1rem" }}>
+              Add
+            </IonButton>
+          </form>
+        </IonContent>
+      </IonModal>
     </div>
   );
 }

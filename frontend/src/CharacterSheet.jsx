@@ -1,4 +1,12 @@
 import { useState } from "react";
+import {
+  IonButton,
+  IonInput,
+  IonLabel,
+  IonProgressBar,
+  IonSegment,
+  IonSegmentButton,
+} from "@ionic/react";
 import { api } from "./api";
 import EquipmentPanel from "./EquipmentPanel";
 import InventoryPanel from "./InventoryPanel";
@@ -34,8 +42,6 @@ export default function CharacterSheet({ character, onChange }) {
     }
   }
 
-  const hpPct = Math.round((character.currentHp / character.maxHp) * 100);
-
   return (
     <div className="sheet">
       {error && <p className="error">{error}</p>}
@@ -49,39 +55,38 @@ export default function CharacterSheet({ character, onChange }) {
 
       <section>
         <h3>Hit Points</h3>
-        <div className="hpbar">
-          <div className="hpfill" style={{ width: `${hpPct}%` }} />
-          <span>
-            {character.currentHp} / {character.maxHp}
-          </span>
-        </div>
+        <IonProgressBar value={character.currentHp / character.maxHp} />
+        <p>
+          {character.currentHp} / {character.maxHp}
+        </p>
         <div className="row">
-          <input
+          <IonInput
+            className="amountinput"
             type="number"
             min="1"
             placeholder="amount"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onIonInput={(e) => setAmount(e.detail.value ?? "")}
           />
-          <button
+          <IonButton
             onClick={() => mutate(() => api.damage(character.id, Number(amount)))}
           >
             Damage
-          </button>
-          <button
+          </IonButton>
+          <IonButton
             onClick={() => mutate(() => api.heal(character.id, Number(amount)))}
           >
             Heal
-          </button>
-          <button
-            className="rest"
+          </IonButton>
+          <IonButton
+            color="success"
             onClick={() =>
               window.confirm("Long rest? HP and all resources refill.") &&
               mutate(() => api.longRest(character.id))
             }
           >
             Long Rest
-          </button>
+          </IonButton>
         </div>
       </section>
 
@@ -117,20 +122,17 @@ export default function CharacterSheet({ character, onChange }) {
       </section>
 
       <section>
-        <div className="tabs invtabs">
-          <button
-            className={invTab === "inventory" ? "active" : ""}
-            onClick={() => setInvTab("inventory")}
-          >
-            Inventory
-          </button>
-          <button
-            className={invTab === "equipment" ? "active" : ""}
-            onClick={() => setInvTab("equipment")}
-          >
-            Equipment
-          </button>
-        </div>
+        <IonSegment
+          value={invTab}
+          onIonChange={(e) => setInvTab(e.detail.value)}
+        >
+          <IonSegmentButton value="inventory">
+            <IonLabel>Inventory</IonLabel>
+          </IonSegmentButton>
+          <IonSegmentButton value="equipment">
+            <IonLabel>Equipment</IonLabel>
+          </IonSegmentButton>
+        </IonSegment>
         {invTab === "inventory" ? (
           <InventoryPanel character={character} mutate={mutate} />
         ) : (

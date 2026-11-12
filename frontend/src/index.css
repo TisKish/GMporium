@@ -1,5 +1,7 @@
-/* Party Sheets — minimal dark-table styling. Not the point of the
-   project (the backend is), but nobody wants to demo an ugly app. */
+/* Party Sheets — dark-table styling on top of Ionic.
+   Ionic owns the components (buttons, inputs, cards, modals); this file
+   keeps the app's own pieces: the character sheet, the paper doll, the
+   rarity colors, and the small-screen tweaks. */
 
 :root {
   --bg: #14111b;
@@ -10,6 +12,15 @@
   --accent: #b48cf2;
   --danger: #e56b6b;
   --heal: #6fce8b;
+
+  /* Ionic theme: primary is the app's accent purple, so Ionic components
+     (segments, progress bars, buttons) match the custom UI. */
+  --ion-color-primary: #b48cf2;
+  --ion-color-primary-rgb: 180, 140, 242;
+  --ion-color-primary-contrast: #14111b;
+  --ion-color-primary-contrast-rgb: 20, 17, 27;
+  --ion-color-primary-shade: #9e7bd5;
+  --ion-color-primary-tint: #bc98f3;
 }
 
 * { box-sizing: border-box; }
@@ -22,21 +33,6 @@ body {
 }
 
 .app { max-width: 720px; margin: 0 auto; padding: 1rem; }
-
-nav {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
-}
-
-nav strong { color: var(--accent); font-size: 1.2rem; }
-nav span { margin-left: auto; color: var(--muted); }
-
-.tabs { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 
 button {
   background: var(--panel);
@@ -60,8 +56,6 @@ button.active { background: var(--accent); color: #14111b; border-color: var(--a
   border-radius: 12px;
 }
 
-.login form { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1rem; }
-
 input {
   background: var(--bg);
   color: var(--text);
@@ -83,32 +77,10 @@ input {
 .sheet h3 { margin: 0 0 0.6rem 0; color: var(--accent); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.05em; }
 .subtitle { color: var(--muted); margin: 0.25rem 0 0 0; }
 
-.hpbar {
-  position: relative;
-  height: 2.2rem;
-  background: #2a2438;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 0.6rem;
-}
-
-.hpfill {
-  height: 100%;
-  background: linear-gradient(90deg, #7a4fd0, #b48cf2);
-  transition: width 0.25s;
-}
-
-.hpbar span {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
 .row { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
-.row input { width: 7rem; }
+
+/* The HP amount field stays narrow next to the Damage/Heal buttons. */
+ion-input.amountinput { flex: 0 0 7rem; }
 
 .resource { justify-content: space-between; padding: 0.35rem 0; border-bottom: 1px dashed var(--border); }
 .resource:last-child { border-bottom: none; }
@@ -131,98 +103,13 @@ input {
 .muted { color: var(--muted); }
 .small { font-size: 0.8rem; }
 
-ul { margin: 0; padding-left: 1.2rem; }
-li { margin: 0.25rem 0; }
+/* --- Inventory (Ionic cards; the grid itself is IonGrid) --- */
 
-/* --- Inventory + Equipment (Diablo doll, BG3 backpack) --- */
+.invcard { cursor: pointer; margin: 0; }
+.invcard.selected { border: 2px solid var(--ion-color-primary); }
 
-.invtabs { margin-bottom: 1rem; }
-.filtertabs button { font-size: 0.85rem; padding: 0.3rem 0.6rem; }
+/* --- Equipment paper doll (bespoke layout; Ionic has no doll) --- */
 
-.invtools { margin-bottom: 0.75rem; }
-.invtools input { flex: 1; min-width: 10rem; }
-.invtools select {
-  background: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 0.5rem;
-}
-
-.invgrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.invitem {
-  text-align: left;
-  padding: 0.6rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-
-.invitem.selected { border-color: var(--accent); background: #2a2340; }
-
-.invname { font-weight: bold; }
-.qty {
-  float: right;
-  color: var(--muted);
-  font-size: 0.8rem;
-}
-.invmeta { font-size: 0.8rem; color: var(--muted); }
-
-.detail {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  margin-bottom: 0.75rem;
-}
-
-.detail h4 { margin: 0 0 0.25rem 0; }
-.detail p { margin: 0.25rem 0; }
-
-.weightbar { margin: 0.75rem 0; }
-.weighttrack {
-  height: 0.9rem;
-  background: #2a2438;
-  border-radius: 6px;
-  overflow: hidden;
-  margin-bottom: 0.25rem;
-}
-.weightfill { height: 100%; background: var(--accent); transition: width 0.25s; }
-.weightfill.over { background: var(--danger); }
-
-.addform {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px dashed var(--border);
-}
-.addform input, .addform select {
-  background: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 0.5rem;
-}
-.addform input:first-child { flex: 1 1 12rem; }
-
-button.danger { color: var(--danger); }
-
-/* Diablo rarity colors (item names). */
-.rarity-common { color: var(--text); }
-.rarity-uncommon { color: #6fce8b; }
-.rarity-rare { color: #6b9fe5; }
-.rarity-very_rare { color: #b48cf2; }
-.rarity-legendary { color: #e59a4b; }
-
-/* Paper doll: slots arranged around a center portrait. */
 .doll {
   display: grid;
   grid-template-columns: 1fr 1.2fr 1fr;
@@ -283,3 +170,19 @@ button.danger { color: var(--danger); }
   color: var(--accent);
 }
 .portrait small { color: var(--muted); }
+
+/* Diablo rarity colors (item names). */
+.rarity-common { color: var(--text); }
+.rarity-uncommon { color: #6fce8b; }
+.rarity-rare { color: #6b9fe5; }
+.rarity-very_rare { color: #b48cf2; }
+.rarity-legendary { color: #e59a4b; }
+
+/* --- Small screens: the doll and the ability row get room to breathe. --- */
+@media (max-width: 480px) {
+  .doll { gap: 0.35rem; }
+  .dollslot { min-height: 2.8rem; padding: 0.35rem; }
+  .slotitem { font-size: 0.8rem; }
+  .portrait span { width: 3.2rem; height: 3.2rem; font-size: 1.5rem; }
+  .abilities { grid-template-columns: repeat(3, 1fr); }
+}

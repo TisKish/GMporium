@@ -1,3 +1,4 @@
+import { IonText } from "@ionic/react";
 import { api } from "./api";
 
 export const SLOT_LABELS = {
@@ -74,10 +75,12 @@ export default function EquipmentPanel({ character, mutate }) {
           <small>{character.name}</small>
         </div>
       </div>
-      <p className="muted small">
-        Click an equipped item to unequip it. To equip something, pick a slot
-        for it on the Inventory tab.
-      </p>
+      <IonText color="medium">
+        <p className="small">
+          Click an equipped item to unequip it. To equip something, pick a
+          slot for it on the Inventory tab.
+        </p>
+      </IonText>
     </div>
   );
 }
